@@ -44,8 +44,8 @@ const TOKENS = {
     --we-panel-color: #1e1f26; --we-saturate: 1.8; --we-glass-brightness: 1.04;
     --we-hovercard-alpha: .61; --we-hovercard-blur: 16px;
     background:
-      radial-gradient(1100px 700px at 12% 8%, #5a463b 0%, transparent 58%),
-      radial-gradient(900px 700px at 92% 70%, #263441 0%, transparent 62%),
+      radial-gradient(1300px 700px at 12% 8%, #5a463b 0%, transparent 58%),
+      radial-gradient(1100px 700px at 92% 70%, #263441 0%, transparent 62%),
       linear-gradient(155deg, #3a312c 0%, #1c2026 48%, #2b2420 100%);
     color: #f9fafb;
   `,
@@ -66,8 +66,8 @@ const TOKENS = {
     --we-panel-color: #ffffff; --we-saturate: 1.8; --we-glass-brightness: 1.04;
     --we-hovercard-alpha: .61; --we-hovercard-blur: 16px;
     background:
-      radial-gradient(1100px 700px at 12% 8%, #e5d5c6 0%, transparent 58%),
-      radial-gradient(900px 700px at 92% 70%, #c9d8df 0%, transparent 62%),
+      radial-gradient(1300px 700px at 12% 8%, #e5d5c6 0%, transparent 58%),
+      radial-gradient(1100px 700px at 92% 70%, #c9d8df 0%, transparent 62%),
       linear-gradient(155deg, #ded8d1 0%, #eef0f2 48%, #d9d0c8 100%);
     color: #0f1115;
   `,
@@ -76,21 +76,27 @@ const TOKENS = {
 function page(theme, glassCss) {
   const dark = theme === 'dark'
   return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><style>
-  html, body { margin: 0; width: 900px; height: 320px; overflow: hidden; }
+  html, body { margin: 0; width: 1160px; height: 320px; overflow: hidden; }
   body {
     ${TOKENS[theme]}
     font: 12px/18px "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", system-ui, sans-serif;
   }
   .panel {
-    position: fixed; top: 30px; box-sizing: border-box; padding: 16px;
+    position: fixed; top: 34px; box-sizing: border-box; padding: 16px;
     border-radius: var(--dsw-radius-lg); background: var(--dsw-specific-menu);
     backdrop-filter: var(--dsw-menu-backdrop-filter); color: var(--dsw-alias-label-secondary);
     --dsw-elevation-stroke-color: var(--dsw-alias-border-l1);
     box-shadow: var(--dsw-elevation-prominent);
     font-size: 12px; line-height: 18px; overflow: hidden; z-index: 1100;
   }
-  #usage { left: 50px; width: 400px; }
-  #rewind { left: 500px; width: 300px; }
+  .panel-label { position: fixed; top: 8px; font-size: 11px; line-height: 14px;
+    color: var(--dsw-alias-label-tertiary); opacity: .85; }
+  #usage { left: 30px; width: 400px; }
+  #rewind { left: 460px; width: 300px; }
+  #impact { left: 790px; width: 320px; }
+  #usage-label { left: 30px; }
+  #rewind-label { left: 460px; }
+  #impact-label { left: 790px; }
   .title { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 8px;
     font-weight: 500; color: var(--dsw-alias-label-primary); }
   .rule { border-top: .5px solid var(--dsw-alias-border-l2); margin-bottom: 10px; }
@@ -118,6 +124,7 @@ function page(theme, glassCss) {
   ${glassCss}
   </style></head>
   <body data-we-glass-page data-we-glass-floaters${dark ? ' data-ds-dark-theme' : ''}>
+    <div id="usage-label" class="panel-label">官方 · 本轮用量</div>
     <div id="usage" class="panel" role="dialog" aria-label="本轮用量">
       <div class="title"><span>本轮用量</span><span>348,599 tok</span></div>
       <div class="rule"></div>
@@ -130,15 +137,26 @@ function page(theme, glassCss) {
         <dt>输出</dt><dd>1,836 tok</dd>
       </dl>
     </div>
+
+    <div id="rewind-label" class="panel-label">dsh-rewind · 模式选择</div>
     <div id="rewind" class="panel" role="dialog" aria-label="回退到这条消息">
       <div class="rw-title">回退到这条消息</div>
-      <div class="rw-target">是不是就是那个“包含的组件”这个东西，这么看这个插件设计得好高级啊</div>
+      <div class="rw-target">这里是一段用于演示回退目标的消息摘要，内容仅为示例。</div>
       <button class="rw-option" type="button">
         <span>仅回退对话</span>
         <span class="hint">仅回退上下文，不动工作区文件</span>
       </button>
       <div class="rw-impact">无法获取影响清单：文件还原不可用。</div>
-      <div class="rw-actions"><button class="ghost" type="button">取消</button><button class="primary" type="button">确认</button></div>
+    </div>
+
+    <div id="impact-label" class="panel-label">dsh-rewind · 文件变更确认</div>
+    <div id="impact" class="panel" role="dialog" aria-label="确认回退">
+      <div class="rw-impact">还原 src/client/popover.ts
+还原 src/client/styles.ts</div>
+      <div class="rw-actions">
+        <button class="ghost" type="button">返回</button>
+        <button class="primary" type="button">确认回退</button>
+      </div>
     </div>
   </body></html>`
 }
@@ -153,17 +171,14 @@ function comparison(theme) {
   html, body { margin: 0; background: ${bg}; color: ${fg}; }
   body { padding: 24px; font: 14px/1.5 "Noto Sans CJK SC", "Noto Sans SC", system-ui, sans-serif; }
   h1 { margin: 0 0 18px; font-size: 18px; font-weight: 600; }
-  .row { display: flex; gap: 20px; align-items: flex-start; }
-  figure { margin: 0; width: 900px; }
-  img { display: block; width: 900px; height: 320px; border-radius: 8px; }
-  figcaption { margin-top: 10px; font-size: 13px; line-height: 1.5; color: ${muted}; }
+  figure { margin: 0 0 18px; width: 1160px; }
+  img { display: block; width: 1160px; height: 320px; border-radius: 8px; }
+  figcaption { margin-top: 8px; font-size: 13px; line-height: 1.5; color: ${muted}; }
   figcaption strong { color: ${fg}; }
   </style></head><body>
     <h1>${title}</h1>
-    <div class="row">
-      <figure><img src="../before-${theme}.png" alt="before"><figcaption><strong>修改前</strong>：裸 <code>&gt; div</code> 把每个直接子 div 都涂上 HoverCard 的底、渐变与霜，出现多条不同色色带。</figcaption></figure>
-      <figure><img src="../after-${theme}.png" alt="after"><figcaption><strong>修改后</strong>：<code>&gt; div:only-of-type</code> 只命中真正的单卡 HoverCard；两个面板恢复统一的菜单底。</figcaption></figure>
-    </div>
+    <figure><img src="../before-${theme}.png" alt="before"><figcaption><strong>修改前</strong>：裸 <code>&gt; div</code> 把每个直接子 div 都涂上 HoverCard 的底、渐变与霜。官方“本轮用量”的标题、模式弹层的标题/摘要/提示、文件确认弹层的文件清单/按钮行各带一条色带。</figcaption></figure>
+    <figure><img src="../after-${theme}.png" alt="after"><figcaption><strong>修改后</strong>：<code>&gt; div:only-of-type</code> 只命中真正的单卡 HoverCard；三个面板恢复统一的菜单底。</figcaption></figure>
   </body></html>`
 }
 
@@ -183,8 +198,8 @@ function shot(html, out, width, height) {
 
 mkdirSync(tmp, { recursive: true })
 for (const theme of ['dark', 'light']) {
-  shot(page(theme, CSS_GLASS), `before-${theme}.png`, 900, 320)
-  shot(page(theme, cssAfter), `after-${theme}.png`, 900, 320)
-  shot(comparison(theme), `comparison-${theme}.png`, 1860, 470)
+  shot(page(theme, CSS_GLASS), `before-${theme}.png`, 1160, 320)
+  shot(page(theme, cssAfter), `after-${theme}.png`, 1160, 320)
+  shot(comparison(theme), `comparison-${theme}.png`, 1160, 810)
 }
 rmSync(tmp, { recursive: true, force: true })
